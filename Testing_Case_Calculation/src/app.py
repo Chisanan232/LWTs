@@ -15,7 +15,7 @@ app.config["debug"] = True
 
 @app.route("/spec-testing-time")
 def testing_time_page():
-    return render_template("testing_time.html")
+    return render_template("index.html")
 
 
 
