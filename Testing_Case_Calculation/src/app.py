@@ -21,7 +21,7 @@ def testing_time_page():
 
 @app.route("/static/<path:filename>", methods=["GET"])
 def images(filename):
-    return send_from_directory('images', filename)
+    return send_from_directory('img', filename)
     
 
 
