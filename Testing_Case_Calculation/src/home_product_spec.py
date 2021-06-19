@@ -1,20 +1,10 @@
-from openpyxl import Workbook, load_workbook
-from string import ascii_uppercase
-from typing import List, Dict
+from exceptions import DeviceModelDoesnotExistException, ParameterCannotBeNone
+
 from abc import ABCMeta, abstractmethod
+from typing import List, Dict
+from string import ascii_uppercase
+from openpyxl import Workbook, load_workbook
 
-
-
-class DeviceModelDoesnotExistException(Exception):
-
-    def __str__(self):
-        return "Target device model doesn't exist."
-
-
-class ParameterCannotBeNone(Exception):
-
-    def __str__(self):
-        return "Parameter cannot all be None."
 
 
 _Spec_Device_Info: List[Dict[str, str]] = []
@@ -206,6 +196,27 @@ class ResultTestSpec(TestSpec):
                                                row=datarow_index,
                                                columns=self._get_ascii_char(start_ascii="D",
                                                                             end_ascii="J"))
+
+
+    def get_full_test(self):
+        return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
+                                               row=4,
+                                               columns=self._get_ascii_char(start_ascii="D",
+                                                                            end_ascii="J"))
+
+
+    def get_regression_test(self):
+        return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
+                                               row=4,
+                                               columns=self._get_ascii_char(start_ascii="K",
+                                                                            end_ascii="N"))
+
+
+    def get_easy_test(self):
+        return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
+                                               row=4,
+                                               columns=self._get_ascii_char(start_ascii="O",
+                                                                            end_ascii="O"))
 
 
 
