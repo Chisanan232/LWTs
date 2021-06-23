@@ -6,9 +6,10 @@ from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.cell import Cell
 from openpyxl.utils import get_column_letter
 from string import ascii_uppercase
-from typing import Iterable, Dict
+from typing import Iterable, Dict, Tuple
 from copy import copy
 import json
+import re
 
 
 
@@ -38,9 +39,124 @@ class ResultReport:
         Saving the content of data which be target to display and calculate testing time.
         Calculate the total testing time.
         """
-        cls.__copy_sheet_page(old_sheet_page=refer_sheet_page, new_sheet_page=report_sheet_page, target_value=target_info)
+        __testing_data = cls.testing_data_handling(target_info=target_info)
+        cls.__copy_sheet_page(old_sheet_page=refer_sheet_page, new_sheet_page=report_sheet_page, target_value=__testing_data)
         cls.__merge_cells(sheet_page=report_sheet_page)
         return workbook
+
+
+    @classmethod
+    def testing_data_handling(cls, target_info: Dict[str, Dict]) -> Dict:
+        spec = FullTestSpec()
+        spec.loading_content()
+        all_device_modules = spec.get_all_device_model()
+        data_config = []
+
+        print(f"target_info: {target_info}")
+        print(f"target_info.values(): {target_info.values()}")
+        for info in target_info.values():
+            # Get value
+            __device_model = info["device_model"]
+            __spec_type = info["spec_type"]
+            __items = info["items"]
+
+            # Get the specific module index
+            __device_model_excel_index = all_device_modules.index(__device_model)
+
+            # Determine the spec type which need to use and calculate the testing time
+            result_test_items, all_testing_items = cls.calculate_items_testing_time(spec_type=__spec_type, items=__items)
+
+            # Save result into data-config
+            data_config.append({
+                "device_model": __device_model,
+                "spec_type": __spec_type,
+                "excel_index": __device_model_excel_index,
+                "excel_columns": result_test_items,
+                "excel_value": all_testing_items
+            })
+
+        # Add the NaN to the modules aren't target.
+        list_data_index = 0
+        for index, __one_device_model in enumerate(all_device_modules):
+            if index == 0:
+                # the first time, get and check the data index
+                __modul = data_config[list_data_index]["device_model"]
+                __modul_excel_index = data_config[list_data_index]["excel_index"]
+                list_data_index += 1
+
+            if index != __modul_excel_index:
+                # Insert default value into config
+                data_config.append({
+                    "device_model": __device_model,
+                    "spec_type": __spec_type,
+                    "excel_index": __device_model_excel_index,
+                    "excel_columns": result_test_items,
+                    "excel_value": all_testing_items
+                })
+            else:
+                # Insert the mapping index data into list.
+                data_config.append({
+                    "device_model": __one_device_model,
+                    "spec_type": __spec_type,
+                    "excel_index": index,
+                    "excel_columns": None,
+                    "excel_value": None
+                })
+                # Get the next value.
+                __modul = data_config[list_data_index]["device_model"]
+                __modul_excel_index = data_config[list_data_index]["excel_index"]
+                list_data_index += 1
+
+        print(f"Data config: {data_config}")
+        return data_config
+
+
+    @classmethod
+    def calculate_items_testing_time(cls, spec_type: str, items: list) -> Tuple[list, Dict[str, float]]:
+        """
+        Sample Data:
+        {
+            "spec_testing_time_0":{
+                "device_model":"",
+                "spec_type":null,
+                "items":[]
+                },
+            "spec_testing_time_1":{
+                "device_model":"COVR-1103_A1",
+                "spec_type":"full_test",
+                "items":["{COVR-Reunion: 1}","{FOTA_In_Wizard: 12.5}","{Full_Total: =SUM(C2:R2)}"]
+                }
+        }
+        """
+
+        __testing_time = {}
+
+        def calculate_time(result_items: list, item: dict):
+            for __result_items in result_items:
+                if re.search(re.escape(__result_items), str(item.keys[0]), re.IGNORECASE):
+                    __testing_time[str(item.keys[0])] = float(item.values[0])
+                    break
+            else:
+                __testing_time["Basic_Function"] = __testing_time["Basic_Function"] + float(__item.values)
+
+        __result_spec = ResultTestSpec()
+        final_items = None
+        print(f"item: {items}")
+        if spec_type == "full_test":
+            final_items = __result_spec.get_full_test()
+            for __item in items:
+                print(f"__item: {__item}")
+                calculate_time(result_items=final_items, item=dict(__item))
+        elif spec_type == "regression_test":
+            final_items = __result_spec.get_regression_test()
+            for __item in items:
+                calculate_time(result_items=final_items, item=dict(__item))
+        elif spec_type == "sampling_test":
+            final_items = __result_spec.get_easy_test()
+            for __item in items:
+                calculate_time(result_items=final_items, item=dict(__item))
+
+        return final_items, __testing_time
 
 
     @classmethod
