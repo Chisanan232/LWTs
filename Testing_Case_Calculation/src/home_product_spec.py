@@ -241,7 +241,7 @@ class FullTestSpec(TestSpec):
         return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
                                                row=1,
                                                columns=self._get_ascii_char(start_ascii="C",
-                                                                            end_ascii="S"))
+                                                                            end_ascii="R"))
 
 
     def get_each_cases_testing_time_by_device(self, device_model: str = None, index: int = None) -> List[str]:
@@ -249,7 +249,7 @@ class FullTestSpec(TestSpec):
         return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
                                                row=datarow_index,
                                                columns=self._get_ascii_char(start_ascii="C",
-                                                                            end_ascii="S"))
+                                                                            end_ascii="R"))
 
 
 
@@ -274,7 +274,7 @@ class RegressionTestSpec(TestSpec):
         return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
                                                row=1,
                                                columns=self._get_ascii_char(start_ascii="C",
-                                                                            end_ascii="J"))
+                                                                            end_ascii="I"))
 
 
     def get_each_cases_testing_time_by_device(self, device_model: str = None, index: int = None) -> List[str]:
@@ -282,7 +282,7 @@ class RegressionTestSpec(TestSpec):
         return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
                                                row=datarow_index,
                                                columns=self._get_ascii_char(start_ascii="C",
-                                                                            end_ascii="E"))
+                                                                            end_ascii="I"))
 
 
 
@@ -307,7 +307,7 @@ class EasyTestSpec(TestSpec):
         return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
                                                row=1,
                                                columns=self._get_ascii_char(start_ascii="C",
-                                                                            end_ascii="E"))
+                                                                            end_ascii="D"))
 
 
     def get_each_cases_testing_time_by_device(self, device_model: str = None, index: int = None) -> List[str]:
@@ -315,5 +315,5 @@ class EasyTestSpec(TestSpec):
         return self._get_all_row_data_with_row(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
                                                row=datarow_index,
                                                columns=self._get_ascii_char(start_ascii="C",
-                                                                            end_ascii="E"))
+                                                                            end_ascii="D"))
 
