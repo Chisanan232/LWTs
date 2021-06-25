@@ -77,38 +77,46 @@ class ResultReport:
 
         # Add the NaN to the modules aren't target.
         list_data_index = 0
+        final_data_config = []
         for index, __one_device_model in enumerate(all_device_modules):
             if index == 0:
                 # the first time, get and check the data index
                 __modul = data_config[list_data_index]["device_model"]
+                __modul_spec_type = data_config[list_data_index]["spec_type"]
                 __modul_excel_index = data_config[list_data_index]["excel_index"]
+                __modul_excel_columns = data_config[list_data_index]["excel_columns"]
+                __modul_excel_value = data_config[list_data_index]["excel_value"]
                 list_data_index += 1
 
             if index != __modul_excel_index:
                 # Insert default value into config
-                data_config.append({
-                    "device_model": __device_model,
-                    "spec_type": __spec_type,
-                    "excel_index": __device_model_excel_index,
-                    "excel_columns": result_test_items,
-                    "excel_value": all_testing_items
-                })
-            else:
-                # Insert the mapping index data into list.
-                data_config.append({
+                final_data_config.append({
                     "device_model": __one_device_model,
-                    "spec_type": __spec_type,
+                    "spec_type": None,
                     "excel_index": index,
                     "excel_columns": None,
                     "excel_value": None
                 })
+            else:
+                # Insert the mapping index data into list.
+                final_data_config.append({
+                    "device_model": __modul,
+                    "spec_type": __modul_spec_type,
+                    "excel_index": __modul_excel_index,
+                    "excel_columns": __modul_excel_columns,
+                    "excel_value": __modul_excel_value
+                })
                 # Get the next value.
-                __modul = data_config[list_data_index]["device_model"]
-                __modul_excel_index = data_config[list_data_index]["excel_index"]
-                list_data_index += 1
+                if list_data_index < len(data_config):
+                    __modul = data_config[list_data_index]["device_model"]
+                    __modul_spec_type = data_config[list_data_index]["spec_type"]
+                    __modul_excel_index = data_config[list_data_index]["excel_index"]
+                    __modul_excel_columns = data_config[list_data_index]["excel_columns"]
+                    __modul_excel_value = data_config[list_data_index]["excel_value"]
+                    list_data_index += 1
 
-        print(f"Data config: {data_config}")
-        return data_config
+        # print(f"Data config: {data_config}")
+        return final_data_config
 
 
     @classmethod
@@ -133,19 +141,27 @@ class ResultReport:
 
         def calculate_time(result_items: list, item: dict):
             for __result_items in result_items:
-                if re.search(re.escape(__result_items), str(item.keys[0]), re.IGNORECASE):
-                    __testing_time[str(item.keys[0])] = float(item.values[0])
+                print(f"check value: {__result_items}")
+                print(f"target value: {item}")
+                print(f"target value: {item.keys()}")
+                __key = list(item.keys())
+                print(f"target value: {str(__key)}")
+                print(f"target value: {str(__key[0])}")
+                if re.search(re.escape(__result_items), str(list(item.keys())[0]), re.IGNORECASE):
+                    __testing_time[str(item.keys[0])] = float(list(item.values())[0])
                     break
             else:
-                __testing_time["Basic_Function"] = __testing_time["Basic_Function"] + float(__item.values)
+                __testing_time["Basic_Function"] = __testing_time.get("Basic_Function", 0) + float(list(item.values())[0])
 
         __result_spec = ResultTestSpec()
         final_items = None
         print(f"item: {items}")
         if spec_type == "full_test":
             final_items = __result_spec.get_full_test()
+            print(f"final_items: {final_items}")
             for __item in items:
                 print(f"__item: {__item}")
+                print(f"__item type: {type(__item)}")
                 calculate_time(result_items=final_items, item=dict(__item))
         elif spec_type == "regression_test":
             final_items = __result_spec.get_regression_test()
@@ -198,7 +214,7 @@ class ResultReport:
                         cls.__copy_value(old_cell=cell, new_cell=new_cell)
                         cls.__copy_width(old_sheet_page=old_sheet_page, new_sheet_page=new_sheet_page, cell=cell)
                         cls.__copy_styles(old_cell=cell, new_cell=new_cell)
-                        checksum = cls.chk_device_module(current=cell, target=json.loads(target_value))
+                        checksum = cls.chk_device_module(current=cell, target=target_value)
                     elif cell_index < 2:
                         # new_cell = report_sheet_page.cell(row=cell.row, column=cell.col_idx, value=cell.value)
                         new_cell = new_sheet_page[cell.coordinate]
@@ -213,9 +229,12 @@ class ResultReport:
                             # print("Just insert empty value.")
 
 
-
     @classmethod
     def chk_device_module(cls, current: Cell, target: Dict) -> bool:
+        """
+        Think about procedure.
+        """
+        print(f"target: {target}")
         if current.value is not None:
             print(f"[DEBUG] current value: {current.value}")
         for device_info_index, device_info in target.items():
