@@ -1,5 +1,6 @@
 from dlink_home_product_spec import DLinkHomeProductSpec
 from home_product_spec import TestSpec, ResultTestSpec, FullTestSpec, RegressionTestSpec, EasyTestSpec
+from columns import FullTestColumns, RegressionTestColumns, EasyTestColumns
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -199,7 +200,7 @@ class ResultReport:
     @classmethod
     def __copy_sheet_page(cls, old_sheet_page: Worksheet, new_sheet_page: Worksheet, target_value: Iterable):
         for row_index, row in enumerate(old_sheet_page):
-            checksum = None
+            # checksum = None
             for cell_index, cell in enumerate(row):
                 if row_index < 4:
                     # new_cell = report_sheet_page.cell(row=cell.row, column=cell.col_idx, value=cell.value)
@@ -214,7 +215,7 @@ class ResultReport:
                         cls.__copy_value(old_cell=cell, new_cell=new_cell)
                         cls.__copy_width(old_sheet_page=old_sheet_page, new_sheet_page=new_sheet_page, cell=cell)
                         cls.__copy_styles(old_cell=cell, new_cell=new_cell)
-                        checksum = cls.chk_device_module(current=cell, target=target_value)
+                        # checksum = cls.chk_device_module(current=cell, target=target_value)
                     elif cell_index < 2:
                         # new_cell = report_sheet_page.cell(row=cell.row, column=cell.col_idx, value=cell.value)
                         new_cell = new_sheet_page[cell.coordinate]
@@ -222,11 +223,52 @@ class ResultReport:
                         cls.__copy_width(old_sheet_page=old_sheet_page, new_sheet_page=new_sheet_page, cell=cell)
                         cls.__copy_styles(old_cell=cell, new_cell=new_cell)
                     else:
-                        if checksum is True:
-                            print("Do something to update value")
+                        # The target detail info about testing time TE needs recording.
+                        if (row_index - 4) < len(target_value):
+                            __current_modul_info = target_value[row_index - 4]
+                            __current_modul_excel_val = __current_modul_info["excel_value"]
+                            if __current_modul_excel_val:
+                                __testing_item_val = 0
+
+                                if cell_index == FullTestColumns.BasicFunction:
+                                    __testing_item_val = __current_modul_excel_val.get("Basic_Function", 0)
+                                if cell_index == FullTestColumns.ParentalControl:
+                                    __testing_item_val = __current_modul_excel_val.get("Parental_control", 0)
+                                if cell_index == FullTestColumns.AdvanceParentalControl:
+                                    __testing_item_val = __current_modul_excel_val.get("Advance_parental_control", 0)
+                                if cell_index == FullTestColumns.DLinkDeFendFullFunction:
+                                    __testing_item_val = __current_modul_excel_val.get("D-Link_DeFend_full_function", 0)
+                                if cell_index == FullTestColumns.FOTAInWizard:
+                                    __testing_item_val = __current_modul_excel_val.get("FOTA_In_Wizard", 0)
+                                if cell_index == FullTestColumns.RemoteManagement:
+                                    __testing_item_val = __current_modul_excel_val.get("Remote_management", 0)
+                                if cell_index == FullTestColumns.GoogleAndAlexaTest:
+                                    __testing_item_val = __current_modul_excel_val.get("Google_and_Alexa_Test", 0)
+                                
+                                if cell_index == RegressionTestColumns.BasicFunction:
+                                    __testing_item_val = __current_modul_excel_val.get("Basic_Function", 0)
+                                if cell_index == RegressionTestColumns.DLinkDeFendRegressionFunction:
+                                    __testing_item_val = __current_modul_excel_val.get("D-Link_DeFend_full_function", 0)
+                                if cell_index == RegressionTestColumns.FOTAInWizard:
+                                    __testing_item_val = __current_modul_excel_val.get("FOTA_in_wizard", 0)
+                                if cell_index == RegressionTestColumns.RemoteManagement:
+                                    __testing_item_val = __current_modul_excel_val.get("Remote_management", 0)
+                                
+                                if cell_index == EasyTestColumns.EasyTest:
+                                    __testing_item_val = __current_modul_excel_val.get("Easy_Test", 0)
+
+                                new_cell = new_sheet_page[cell.coordinate]
+                                cls.__insert_value(new_cell=new_cell, value=__testing_item_val)
+                                print("Do something to update value")
+                            else:
+                                new_cell = new_sheet_page[cell.coordinate]
+                                cls.__insert_value(new_cell=new_cell, value=0)
+                                cls.__copy_width(old_sheet_page=old_sheet_page, new_sheet_page=new_sheet_page, cell=cell)
+                                cls.__copy_styles(old_cell=cell, new_cell=new_cell)
+                                # print("Insert 0 to the column.")
                         else:
+                            # print("Insert 0 to the column.")
                             pass
-                            # print("Just insert empty value.")
 
 
     @classmethod
@@ -242,6 +284,11 @@ class ResultReport:
                 return True
         else:
             return False
+
+
+    @classmethod
+    def __insert_value(cls, new_cell: Cell, value) -> None:
+        new_cell.value = value
 
 
     @classmethod
