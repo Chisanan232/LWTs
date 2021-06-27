@@ -98,9 +98,9 @@ class TestSpec(metaclass=ABCMeta):
         pass
 
 
+    @abstractmethod
     def get_all_device_model(self):
-        return self._get_all_row_data_with_column(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
-                                                  column="B")
+        pass
 
 
     def __get_device_model_info(self):
@@ -138,12 +138,15 @@ class TestSpec(metaclass=ABCMeta):
         return result_data
 
 
-    def _get_all_row_data_with_column(self, sheet_page, column) -> List[str]:
+    def _get_all_row_data_with_column(self, sheet_page, column, result_sheet=True) -> List[str]:
         result_data: List[str] = []
         for row in range(self.first_datarow_index, self.last_datarow_index + 1):
             cell_value = sheet_page[f"{column}{row}"].value  # the value of the specific cell
             if cell_value is not None:
-                result_data.append("_".join(cell_value.split(sep="_")[:-1]))
+                if result_sheet:
+                    result_data.append(cell_value)
+                else:
+                    result_data.append("_".join(cell_value.split(sep="_")[:-1]))
             else:
                 result_data.append(cell_value)
         return result_data
@@ -167,6 +170,11 @@ class TestSpec(metaclass=ABCMeta):
 
 
 class ResultTestSpec(TestSpec):
+
+    def get_all_device_model(self):
+        return self._get_all_row_data_with_column(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
+                                                  column="C")
+
 
     @property
     def sheet_page_name(self):
@@ -222,6 +230,11 @@ class ResultTestSpec(TestSpec):
 
 class FullTestSpec(TestSpec):
 
+    def get_all_device_model(self):
+        return self._get_all_row_data_with_column(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
+                                                  column="B")
+
+
     @property
     def sheet_page_name(self):
         return "Full"
@@ -255,6 +268,11 @@ class FullTestSpec(TestSpec):
 
 class RegressionTestSpec(TestSpec):
 
+    def get_all_device_model(self):
+        return self._get_all_row_data_with_column(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
+                                                  column="B")
+
+
     @property
     def sheet_page_name(self):
         return "Regression"
@@ -287,6 +305,11 @@ class RegressionTestSpec(TestSpec):
 
 
 class EasyTestSpec(TestSpec):
+
+    def get_all_device_model(self):
+        return self._get_all_row_data_with_column(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
+                                                  column="B")
+
 
     @property
     def sheet_page_name(self):
