@@ -43,7 +43,10 @@ class ResultReport:
         Calculate the total testing time.
         """
         __testing_data = cls.testing_data_handling(target_info=target_info)
-        cls.__copy_sheet_page(old_sheet_page=refer_sheet_page, new_sheet_page=report_sheet_page, target_value=__testing_data)
+        cls.__copy_sheet_page(
+            old_sheet_page=refer_sheet_page, 
+            new_sheet_page=report_sheet_page, 
+            target_value=__testing_data)
         cls.__merge_cells(sheet_page=report_sheet_page)
         return workbook
 
@@ -54,14 +57,16 @@ class ResultReport:
         spec.loading_content()
         all_device_modules = spec.get_all_device_model()
         data_config = []
+        data_config_indexs = []
 
-        print(f"target_info: {target_info}")
-        print(f"type of target_info: {type(target_info)}")
+        # print(f"target_info: {target_info}")
+        # print(f"type of target_info: {type(target_info)}")
         new_target_info = literal_eval(target_info)
-        print(f"type of new_target_info: {type(new_target_info)}")
-        print(f"new_target_info.values(): {new_target_info.values()}")
+        # print(f"type of new_target_info: {type(new_target_info)}")
+        # print(f"new_target_info.values(): {new_target_info.values()}")
         # print(f"target_info.values(): {target_info.values()}")
         for info in new_target_info.values():
+            print(f"info: {info}")
             # Get value
             __device_model = info["device_model"]
             __spec_type = info["spec_type"]
@@ -76,16 +81,52 @@ class ResultReport:
             # Save result into data-config
             ele_index = cls.__chk_module_exists(module=__device_model, data_config=data_config)
             if ele_index:
+                print(f"Multiple devive module ...")
                 for key, value in all_testing_items.items():
                     data_config[ele_index]["excel_value"][key] = value
+                    # data_config_indexs.append(__device_model_excel_index)
             else:
-                data_config.append({
-                    "device_model": __device_model,
-                    "excel_index": __device_model_excel_index,
-                    "excel_columns": result_test_items,
-                    "excel_value": all_testing_items
-                })
+                print(f"Only one devive module ...")
+                print(f"data_config_indexs: {data_config_indexs}")
+                if len(data_config_indexs) > 0:
+                    print(f"len(data_config_indexs): {len(data_config_indexs)}")
+                    for decrease_val in range(0, len(data_config_indexs)):
+                        print(f"test ...")
+                        last_ele_excel_index = data_config_indexs[0 - 1 - decrease_val]
+                        if __device_model_excel_index > last_ele_excel_index:
+                            # Insert data-config.
+                            __index = data_config_indexs.index(last_ele_excel_index) + 1
+                            data_config.insert(__index, {
+                                "device_model": __device_model,
+                                "excel_index": __device_model_excel_index,
+                                "excel_columns": result_test_items,
+                                "excel_value": all_testing_items
+                            })
+                            data_config_indexs.insert(__index, __device_model_excel_index)
+                            break
+                        else:
+                            # Start to find the index order to find the fitting place.
+                            if decrease_val == len(data_config_indexs):
+                                # Insert data-config as first element
+                                data_config.insert(0, data_config.append({
+                                    "device_model": __device_model,
+                                    "excel_index": __device_model_excel_index,
+                                    "excel_columns": result_test_items,
+                                    "excel_value": all_testing_items
+                                }))
+                                data_config_indexs.insert(0, __device_model_excel_index)
+                                break
+                else:
+                    print(f"The len of data_config_indexs <= 0 ")
+                    data_config.append({
+                        "device_model": __device_model,
+                        "excel_index": __device_model_excel_index,
+                        "excel_columns": result_test_items,
+                        "excel_value": all_testing_items
+                    })
+                    data_config_indexs.append(__device_model_excel_index)
 
+        print(f"[DEBUG] Before add rest module info, check the data-config: {data_config}")
         # Add the NaN to the modules aren't target.
         list_data_index = 0
         final_data_config = []
@@ -153,14 +194,14 @@ class ResultReport:
 
         def calculate_time(result_items: list, item: dict):
             for __result_items in result_items:
-                print(f"check value: {__result_items}")
-                print(f"target value: {item}")
-                print(f"target value: {item.keys()}")
+                # print(f"check value: {__result_items}")
+                # print(f"target value: {item}")
+                # print(f"target value: {item.keys()}")
                 __key = list(item.keys())
-                print(f"target value: {str(__key)}")
-                print(f"target value: {str(__key[0])}")
+                # print(f"target value: {str(__key)}")
+                # print(f"target value: {str(__key[0])}")
                 __new_result_items = "_".join(str(__result_items).split(" "))
-                print(f"new check value: {__new_result_items}")
+                # print(f"new check value: {__new_result_items}")
                 if re.search(re.escape(__new_result_items), str(list(item.keys())[0]), re.IGNORECASE):
                     __testing_time[str(list(item.keys())[0])] = float(list(item.values())[0])
                     break
@@ -169,13 +210,13 @@ class ResultReport:
 
         __result_spec = ResultTestSpec()
         final_items = None
-        print(f"item: {items}")
+        # print(f"item: {items}")
         if spec_type == "full_test":
             final_items = __result_spec.get_full_test()
-            print(f"final_items: {final_items}")
+            # print(f"final_items: {final_items}")
             for __item in items:
-                print(f"__item: {__item}")
-                print(f"__item type: {type(__item)}")
+                # print(f"__item: {__item}")
+                # print(f"__item type: {type(__item)}")
                 calculate_time(result_items=final_items, item=literal_eval(__item))
         elif spec_type == "regression_test":
             final_items = __result_spec.get_regression_test()
@@ -212,6 +253,7 @@ class ResultReport:
 
     @classmethod
     def __copy_sheet_page(cls, old_sheet_page: Worksheet, new_sheet_page: Worksheet, target_value: Iterable):
+        print(f"[DEBUG check] final target value: {target_value}")
         for row_index, row in enumerate(old_sheet_page):
             # checksum = None
             for cell_index, cell in enumerate(row):
