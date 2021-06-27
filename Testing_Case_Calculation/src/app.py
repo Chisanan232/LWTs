@@ -1,5 +1,5 @@
 from dlink_home_product_spec import DLinkHomeProductSpec
-from home_product_spec import TestSpec, FullTestSpec, RegressionTestSpec, EasyTestSpec, DeviceModelDoesnotExistException
+from home_product_spec import TestSpec, ResultTestSpec, FullTestSpec, RegressionTestSpec, EasyTestSpec, DeviceModelDoesnotExistException
 from result import ResultReport
 
 from flask import Flask, request, Response, jsonify, render_template, send_from_directory
@@ -33,7 +33,10 @@ def index():
 
 @app.route("/api/v1/deviceModels", methods=["GET"])
 def device_models():
-    target_spec = FullTestSpec()
+    target_spec = ResultTestSpec()
+    # target_spec = FullTestSpec()
+    test = target_spec.get_all_device_model()
+    print(f"test value: {test}")
     return jsonify(target_spec.get_all_device_model())
 
 
