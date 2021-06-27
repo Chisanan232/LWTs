@@ -5,10 +5,12 @@ from columns import FullTestColumns, RegressionTestColumns, EasyTestColumns
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.cell import Cell
+from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 from string import ascii_uppercase
 from typing import Iterable, Dict, Tuple
 from copy import copy
+from ast import literal_eval
 import json
 import re
 
@@ -48,14 +50,18 @@ class ResultReport:
 
     @classmethod
     def testing_data_handling(cls, target_info: Dict[str, Dict]) -> Dict:
-        spec = FullTestSpec()
+        spec = ResultTestSpec()
         spec.loading_content()
         all_device_modules = spec.get_all_device_model()
         data_config = []
 
         print(f"target_info: {target_info}")
-        print(f"target_info.values(): {target_info.values()}")
-        for info in target_info.values():
+        print(f"type of target_info: {type(target_info)}")
+        new_target_info = literal_eval(target_info)
+        print(f"type of new_target_info: {type(new_target_info)}")
+        print(f"new_target_info.values(): {new_target_info.values()}")
+        # print(f"target_info.values(): {target_info.values()}")
+        for info in new_target_info.values():
             # Get value
             __device_model = info["device_model"]
             __spec_type = info["spec_type"]
@@ -68,13 +74,17 @@ class ResultReport:
             result_test_items, all_testing_items = cls.calculate_items_testing_time(spec_type=__spec_type, items=__items)
 
             # Save result into data-config
-            data_config.append({
-                "device_model": __device_model,
-                "spec_type": __spec_type,
-                "excel_index": __device_model_excel_index,
-                "excel_columns": result_test_items,
-                "excel_value": all_testing_items
-            })
+            ele_index = cls.__chk_module_exists(module=__device_model, data_config=data_config)
+            if ele_index:
+                for key, value in all_testing_items.items():
+                    data_config[ele_index]["excel_value"][key] = value
+            else:
+                data_config.append({
+                    "device_model": __device_model,
+                    "excel_index": __device_model_excel_index,
+                    "excel_columns": result_test_items,
+                    "excel_value": all_testing_items
+                })
 
         # Add the NaN to the modules aren't target.
         list_data_index = 0
@@ -82,8 +92,8 @@ class ResultReport:
         for index, __one_device_model in enumerate(all_device_modules):
             if index == 0:
                 # the first time, get and check the data index
+                print(f"final data_config: {data_config}")
                 __modul = data_config[list_data_index]["device_model"]
-                __modul_spec_type = data_config[list_data_index]["spec_type"]
                 __modul_excel_index = data_config[list_data_index]["excel_index"]
                 __modul_excel_columns = data_config[list_data_index]["excel_columns"]
                 __modul_excel_value = data_config[list_data_index]["excel_value"]
@@ -93,7 +103,6 @@ class ResultReport:
                 # Insert default value into config
                 final_data_config.append({
                     "device_model": __one_device_model,
-                    "spec_type": None,
                     "excel_index": index,
                     "excel_columns": None,
                     "excel_value": None
@@ -102,7 +111,6 @@ class ResultReport:
                 # Insert the mapping index data into list.
                 final_data_config.append({
                     "device_model": __modul,
-                    "spec_type": __modul_spec_type,
                     "excel_index": __modul_excel_index,
                     "excel_columns": __modul_excel_columns,
                     "excel_value": __modul_excel_value
@@ -110,7 +118,6 @@ class ResultReport:
                 # Get the next value.
                 if list_data_index < len(data_config):
                     __modul = data_config[list_data_index]["device_model"]
-                    __modul_spec_type = data_config[list_data_index]["spec_type"]
                     __modul_excel_index = data_config[list_data_index]["excel_index"]
                     __modul_excel_columns = data_config[list_data_index]["excel_columns"]
                     __modul_excel_value = data_config[list_data_index]["excel_value"]
@@ -121,15 +128,19 @@ class ResultReport:
 
 
     @classmethod
+    def __chk_module_exists(cls, module: str, data_config: list):
+        for __config in data_config:
+            if module == __config["device_model"]:
+                return data_config.index(__config)
+        else:
+            return False
+
+
+    @classmethod
     def calculate_items_testing_time(cls, spec_type: str, items: list) -> Tuple[list, Dict[str, float]]:
         """
         Sample Data:
         {
-            "spec_testing_time_0":{
-                "device_model":"",
-                "spec_type":null,
-                "items":[]
-                },
             "spec_testing_time_1":{
                 "device_model":"COVR-1103_A1",
                 "spec_type":"full_test",
@@ -148,8 +159,10 @@ class ResultReport:
                 __key = list(item.keys())
                 print(f"target value: {str(__key)}")
                 print(f"target value: {str(__key[0])}")
-                if re.search(re.escape(__result_items), str(list(item.keys())[0]), re.IGNORECASE):
-                    __testing_time[str(item.keys[0])] = float(list(item.values())[0])
+                __new_result_items = "_".join(str(__result_items).split(" "))
+                print(f"new check value: {__new_result_items}")
+                if re.search(re.escape(__new_result_items), str(list(item.keys())[0]), re.IGNORECASE):
+                    __testing_time[str(list(item.keys())[0])] = float(list(item.values())[0])
                     break
             else:
                 __testing_time["Basic_Function"] = __testing_time.get("Basic_Function", 0) + float(list(item.values())[0])
@@ -163,17 +176,17 @@ class ResultReport:
             for __item in items:
                 print(f"__item: {__item}")
                 print(f"__item type: {type(__item)}")
-                calculate_time(result_items=final_items, item=dict(__item))
+                calculate_time(result_items=final_items, item=literal_eval(__item))
         elif spec_type == "regression_test":
             final_items = __result_spec.get_regression_test()
             for __item in items:
-                calculate_time(result_items=final_items, item=dict(__item))
+                calculate_time(result_items=final_items, item=literal_eval(__item))
         elif spec_type == "sampling_test":
             final_items = __result_spec.get_easy_test()
             for __item in items:
-                calculate_time(result_items=final_items, item=dict(__item))
+                calculate_time(result_items=final_items, item=literal_eval(__item))
 
-        return final_items, __testing_time
+        return final_items, {str(spec_type): __testing_time}
 
 
     @classmethod
@@ -224,41 +237,44 @@ class ResultReport:
                         cls.__copy_styles(old_cell=cell, new_cell=new_cell)
                     else:
                         # The target detail info about testing time TE needs recording.
-                        if (row_index - 4) < len(target_value):
+                        if (row_index - 4) < 59:
                             __current_modul_info = target_value[row_index - 4]
                             __current_modul_excel_val = __current_modul_info["excel_value"]
                             if __current_modul_excel_val:
+                                print(f"Before insert, the final value: {__current_modul_info}")
+                                print(f"Before insert, the final value detail: {__current_modul_excel_val}")
                                 __testing_item_val = 0
 
-                                if cell_index == FullTestColumns.BasicFunction:
-                                    __testing_item_val = __current_modul_excel_val.get("Basic_Function", 0)
-                                if cell_index == FullTestColumns.ParentalControl:
-                                    __testing_item_val = __current_modul_excel_val.get("Parental_control", 0)
-                                if cell_index == FullTestColumns.AdvanceParentalControl:
-                                    __testing_item_val = __current_modul_excel_val.get("Advance_parental_control", 0)
-                                if cell_index == FullTestColumns.DLinkDeFendFullFunction:
-                                    __testing_item_val = __current_modul_excel_val.get("D-Link_DeFend_full_function", 0)
-                                if cell_index == FullTestColumns.FOTAInWizard:
-                                    __testing_item_val = __current_modul_excel_val.get("FOTA_In_Wizard", 0)
-                                if cell_index == FullTestColumns.RemoteManagement:
-                                    __testing_item_val = __current_modul_excel_val.get("Remote_management", 0)
-                                if cell_index == FullTestColumns.GoogleAndAlexaTest:
-                                    __testing_item_val = __current_modul_excel_val.get("Google_and_Alexa_Test", 0)
+                                if cell_index == FullTestColumns.BasicFunction.value:
+                                    __testing_item_val = __current_modul_excel_val.get("full_test", {}).get("Basic_Function", 0)
+                                if cell_index == FullTestColumns.ParentalControl.value:
+                                    __testing_item_val = __current_modul_excel_val.get("full_test", {}).get("Parental_control", 0)
+                                if cell_index == FullTestColumns.AdvanceParentalControl.value:
+                                    __testing_item_val = __current_modul_excel_val.get("full_test", {}).get("Advance_parental_control", 0)
+                                if cell_index == FullTestColumns.DLinkDeFendFullFunction.value:
+                                    __testing_item_val = __current_modul_excel_val.get("full_test", {}).get("D-Link_DeFend_full_function", 0)
+                                if cell_index == FullTestColumns.FOTAInWizard.value:
+                                    __testing_item_val = __current_modul_excel_val.get("full_test", {}).get("FOTA_In_Wizard", 0)
+                                if cell_index == FullTestColumns.RemoteManagement.value:
+                                    __testing_item_val = __current_modul_excel_val.get("full_test", {}).get("Remote_management", 0)
+                                if cell_index == FullTestColumns.GoogleAndAlexaTest.value:
+                                    __testing_item_val = __current_modul_excel_val.get("full_test", {}).get("Google_and_Alexa_Test", 0)
                                 
-                                if cell_index == RegressionTestColumns.BasicFunction:
-                                    __testing_item_val = __current_modul_excel_val.get("Basic_Function", 0)
-                                if cell_index == RegressionTestColumns.DLinkDeFendRegressionFunction:
-                                    __testing_item_val = __current_modul_excel_val.get("D-Link_DeFend_full_function", 0)
-                                if cell_index == RegressionTestColumns.FOTAInWizard:
-                                    __testing_item_val = __current_modul_excel_val.get("FOTA_in_wizard", 0)
-                                if cell_index == RegressionTestColumns.RemoteManagement:
-                                    __testing_item_val = __current_modul_excel_val.get("Remote_management", 0)
+                                if cell_index == RegressionTestColumns.BasicFunction.value:
+                                    __testing_item_val = __current_modul_excel_val.get("regression_test", {}).get("Basic_Function", 0)
+                                if cell_index == RegressionTestColumns.DLinkDeFendRegressionFunction.value:
+                                    __testing_item_val = __current_modul_excel_val.get("regression_test", {}).get("D-Link_DeFend_full_function", 0)
+                                if cell_index == RegressionTestColumns.FOTAInWizard.value:
+                                    __testing_item_val = __current_modul_excel_val.get("regression_test", {}).get("FOTA_in_wizard", 0)
+                                if cell_index == RegressionTestColumns.RemoteManagement.value:
+                                    __testing_item_val = __current_modul_excel_val.get("regression_test", {}).get("Remote_management", 0)
                                 
-                                if cell_index == EasyTestColumns.EasyTest:
-                                    __testing_item_val = __current_modul_excel_val.get("Easy_Test", 0)
+                                if cell_index == EasyTestColumns.EasyTest.value:
+                                    __testing_item_val = __current_modul_excel_val.get("easy_test", {}).get("Easy_Test", 0)
 
                                 new_cell = new_sheet_page[cell.coordinate]
-                                cls.__insert_value(new_cell=new_cell, value=__testing_item_val)
+                                print(f"The final insert value: {__testing_item_val}")
+                                cls.__insert_value(new_cell=new_cell, value=float(__testing_item_val))
                                 print("Do something to update value")
                             else:
                                 new_cell = new_sheet_page[cell.coordinate]
@@ -289,6 +305,9 @@ class ResultReport:
     @classmethod
     def __insert_value(cls, new_cell: Cell, value) -> None:
         new_cell.value = value
+        new_cell.font = Font(name="Microsoft JhengHei Light", size=14)
+        new_cell.alignment = Alignment(horizontal="center", vertical="center")
+        new_cell.border = Border(top=Side(border_style='thin', color="00000000"), bottom=Side(border_style='thin', color="00000000"), left=Side(border_style='thin', color="00000000"), right=Side(border_style='thin', color="00000000"))
 
 
     @classmethod
