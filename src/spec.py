@@ -14,7 +14,7 @@ class TestSpec(metaclass=ABCMeta):
 
     __DLink_Test_Time_Spec_File_Name: str = "D-Link-Wi-Fi-config_time_for_tool.xlsx"
 
-    _Spec_Device_Info: List[Dict[str, str]] = None
+    # _Spec_Device_Info: List[Dict[str, str]] = None
 
     _DLink_Spec_WorkBook: Workbook = None
     _DLink_Spec_WorkBook_Sheet_Page: Workbook = None
@@ -44,6 +44,9 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def _get_row_index(self, device_model: str, index: int) -> int:
+        """
+        Get the excel index value of target device module.
+        """
         if device_model is not None:
             device_info = self.check_device_exist(device_model=device_model, get_info=True)
             return int(device_info["index"])
@@ -54,6 +57,10 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def get_each_cases_testing_time(self, device_model: str, index: int = None) -> Dict[str, float]:
+        """
+        Get all test items and the time it needs to use.
+        Return a dict type data, key is test item and value is time.
+        """
         all_test_case_item = self.get_all_test_cases(device_model=device_model)
 
         if device_model is not None:
@@ -83,27 +90,42 @@ class TestSpec(metaclass=ABCMeta):
     @property
     @abstractmethod
     def sheet_page_name(self) -> str:
+        """
+        The using sheet page name currently. 
+        """
         pass
 
 
     @property
     @abstractmethod
     def first_datarow_index(self) -> int:
+        """
+        The index of first data row.
+        """
         pass
 
 
     @property
     @abstractmethod
     def last_datarow_index(self) -> int:
+        """
+        The index of last data row.
+        """
         pass
 
 
     @abstractmethod
     def get_all_device_model(self) -> List[str]:
+        """
+        Get all of device modules of current sheet page.
+        """
         pass
 
 
     def __get_device_model_info(self):
+        """
+        Get device info about excel index, device series and device module.
+        """
         device_model_info = self._get_all_row_data_with_columns(sheet_page=self._DLink_Spec_WorkBook_Sheet_Page,
                                                                 columns="AB")
         for index, info in enumerate(device_model_info):
@@ -112,6 +134,9 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def check_device_exist(self, device_model: str, get_info: bool = False):
+        """
+        Check whether the device module exists or not.
+        """
         if not _Spec_Device_Info:
             self.__get_device_model_info()
 
@@ -125,12 +150,18 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def _get_ascii_char(self, start_ascii: str = 0, end_ascii: str = 26) -> str:
+        """
+        Get all the ascii characters between in 2 ascii.
+        """
         start_ascii_index = ascii_uppercase.index(start_ascii)
         end_ascii_index = ascii_uppercase.index(end_ascii)
         return ascii_uppercase[start_ascii_index:end_ascii_index+1]
 
 
     def _get_all_row_data_with_row(self, sheet_page, row, columns) -> List[str]:
+        """
+        Get all value with multiple columns and one specific row.
+        """
         result_data: List[str] = []
         for column in columns:
             cell_value = sheet_page[f"{column}{row}"].value  # the value of the specific cell
@@ -139,6 +170,9 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def _get_all_row_data_with_column(self, sheet_page, column, result_sheet=True) -> List[str]:
+        """
+        Get all data row with one specific column.
+        """
         result_data: List[str] = []
         for row in range(self.first_datarow_index, self.last_datarow_index + 1):
             cell_value = sheet_page[f"{column}{row}"].value  # the value of the specific cell
@@ -153,6 +187,9 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def _get_all_row_data_with_columns(self, sheet_page, columns) -> List[List[str]]:
+        """
+        Get all data row with multiple columns.
+        """
         result_data: List[List[str]] = []
         for row in range(self.first_datarow_index, self.last_datarow_index + 1):
             data_row: List[str] = []
@@ -164,6 +201,9 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def close_workbook(self):
+        """
+        Close the WorkBook object.
+        """
         self._DLink_Spec_WorkBook.close()
 
 
