@@ -11,6 +11,7 @@ from string import ascii_uppercase
 from typing import Iterable, Dict, Tuple
 from copy import copy
 from ast import literal_eval
+import logging
 import json
 import re
 
@@ -255,7 +256,6 @@ class ResultReport:
     def __copy_sheet_page(cls, old_sheet_page: Worksheet, new_sheet_page: Worksheet, target_value: Iterable):
         print(f"[DEBUG check] final target value: {target_value}")
         for row_index, row in enumerate(old_sheet_page):
-            # checksum = None
             for cell_index, cell in enumerate(row):
                 if row_index < 4:
                     # new_cell = report_sheet_page.cell(row=cell.row, column=cell.col_idx, value=cell.value)
@@ -270,7 +270,6 @@ class ResultReport:
                         cls.__copy_value(old_cell=cell, new_cell=new_cell)
                         cls.__copy_width(old_sheet_page=old_sheet_page, new_sheet_page=new_sheet_page, cell=cell)
                         cls.__copy_styles(old_cell=cell, new_cell=new_cell)
-                        # checksum = cls.chk_device_module(current=cell, target=target_value)
                     elif cell_index < 2:
                         # new_cell = report_sheet_page.cell(row=cell.row, column=cell.col_idx, value=cell.value)
                         new_cell = new_sheet_page[cell.coordinate]
@@ -327,21 +326,6 @@ class ResultReport:
                         else:
                             # print("Insert 0 to the column.")
                             pass
-
-
-    @classmethod
-    def chk_device_module(cls, current: Cell, target: Dict) -> bool:
-        """
-        Think about procedure.
-        """
-        print(f"target: {target}")
-        if current.value is not None:
-            print(f"[DEBUG] current value: {current.value}")
-        for device_info_index, device_info in target.items():
-            if current.value == device_info["device_model"]:
-                return True
-        else:
-            return False
 
 
     @classmethod
