@@ -1,0 +1,45 @@
+#device_model_selector {
+}
+
+#device_model_header {
+    padding-right: 20px;
+}
+
+.spec_test_plan {
+    margin: 10px;
+    border: 1px black solid;
+}
+
+#test_items_form {
+    margin-top: 30px;
+    margin-left: 10px;
+    padding: 5%;
+    border: 1px black solid;
+    width: 475px;
+    height: 500px;
+    overflow: auto;
+}
+
+.selected_form {
+    margin-top: 30px;
+    margin-left: 10%;
+    padding: 5%;
+    border: 1px black solid;
+    width: 450px;
+    height: 500px;
+    overflow: auto;
+}
+
+.export_area {
+    margin: 30px;
+}
+
+#export_button {
+}
+
+.remove_all_test_items, .add_test_items, .remove_test_items {
+    cursor: pointer;
+}
+
+#export_descrp {
+}

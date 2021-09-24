@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="static/css/style_new.css" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="static/js/testing_time_new.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div>Testing Time Calculation</div>
+        </div>
+
+        <div class="row" id="export_descrp">
+            <div>Description: </div>
+        </div>
+
+        <div class="row" id="device_model_selector">
+            <div class="col-lg-4">
+                <span id="device_model_header">Device Model: </span>
+                <select id="device_model">
+                    <option value=""> ---請選擇機器型號--- </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col spec_test_plan">
+                <label id="">
+                    <!-- <span> Full Test </span><input type="checkbox" value="Export Report"> -->
+                    <button type="button" class="test_plan btn btn-default btn-lg" value="full_test"> Full Test </button>
+                </label>
+            </div>
+
+            <div class="col spec_test_plan">
+                <label id="">
+                    <!-- <span> Regression Test </span><input type="radio" value="Export Report"> -->
+                    <button type="button" class="test_plan btn btn-default btn-lg" value="regression_test"> Regression Test </button>
+                </label>
+            </div>
+
+            <div class="col spec_test_plan">
+                <label id="">
+                    <!-- <span> Easy Test </span><input type="radio" value="Export Report"> -->
+                    <button type="button" class="test_plan btn btn-default btn-lg" value="easy_test"> Easy Test </button>
+                </label>
+            </div>
+
+            <div class="col spec_test_plan">
+                <label id="">
+                    <!-- <span> Sampling Test </span><input type="radio" value="Export Report"> -->
+                    <button type="button" class="test_plan btn btn-default btn-lg" value="sampling_test"> Sampling Test </button>
+                </label>
+            </div>
+        </div>
+
+        <div class="row justify-content-start" id="current_setting_header">
+            <div id="current_info">Currently Testing Info: </div>
+        </div>
+
+        <div class="row" id="current_setting_content">
+            <div class="col" id="current_device_model">Device Model: <span id="current_device_model_value"></span></div>
+            <div class="w-100"></div>
+            <div class="col" id="current_test_plan">Test Plan: <span id="current_test_plan_value"></span></div>
+        </div>
+        
+        <div class="row justify-content-start align-items-center">
+            <div class="col col-lg-6">
+                <div id="test_items_form">
+                    <div class="col-md-5 offset-md-10">
+                        <!--
+                        <label>
+                            <input type="button" value="Add" id="add_items_buttom">
+                        </label>
+                        -->
+                        <span class="add_test_items badge bg-primary" id="add_testing_item">
+                            Add
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </span>
+                    </div>
+
+                    <hr size="1" style="border: 1px rgb(255, 255, 255) solid; margin: 3%;">
+        
+                    <table id="test_items_form_table" class="table">
+                        <thead id="test_items_form_theader"></thead>
+                        <tbody id="test_items_form_tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col col-lg-6">
+                <div class="selected_form">
+                    <div class="col-md-5 offset-md-8">
+                        <div class="col h5" id="export_button">
+                            <label id="export_report">
+                                <input type="button" value="Export Report">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="device_modules_target_items">
+                        <!---->
+                    </div>
+    
+                    <div class="" id="device_modules_name">
+                        <!-- For demo UI
+                        <p>
+                            <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#device_a_content" aria-expanded="false" aria-controls="device_a_content">
+                                <span id="device_module_name">DIR-2150 - Full Test</span>
+                            </button>
+                        </p>
+                        <p>
+                            <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#device_a_content" aria-expanded="false" aria-controls="device_a_content">
+                                <span id="device_module_name">DIR-2150 - Full Test</span>
+                            </button>
+                            <span class="remove_all_test_items badge rounded-pill bg-danger">
+                                <span id="tag_content">Clear</span>
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </span>
+                        </p>
+                        -->
+                    </div>
+    
+                    <div class="" id="device_modules_content">
+                        <!-- For demo UI
+                        <div class="collapse" id="device_a_content">
+                            // <div class="card card-body">
+                            <div class="card-body">
+                                <p class="h3">Full Test</p>
+                                <hr size="1" style="border: 1px black solid; margin-top: 0%;">
+                                <div class="testing_items_with_spec">
+                                    <span class="badge rounded-pill bg-primary">
+                                        <span id="tag_content">COVR-Reunion: 0 Hours</span>
+                                        <span class="remove_test_items glyphicon glyphicon-remove"></span>
+                                    </span>
+                                    <span class="badge rounded-pill bg-primary">
+                                        Management-router: 3 Hours
+                                        <span class="remove_test_items glyphicon glyphicon-remove"></span>
+                                    </span>
+                                </div>
+    
+                                <p class="h3">Regression Test</p>
+                                <hr size="1" style="border: 1px black solid; margin-top: 0%;">
+                                <span class="badge rounded-pill bg-primary">
+                                    <span id="tag_content">COVR-Reunion: 0 Hours</span>
+                                    <span class="remove_test_items glyphicon glyphicon-remove"></span>
+                                </span>
+                                <span class="badge rounded-pill bg-primary">
+                                    Management-router: 3 Hours
+                                    <span class="remove_test_items glyphicon glyphicon-remove"></span>
+                                </span>
+                            </div>
+                        </div>
+                        -->
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
