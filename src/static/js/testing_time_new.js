@@ -4,12 +4,6 @@ var SpecTestingTimer = {};
 var SpecTestingTimerId = 0;
 var TestingModuleContent = {};
 
-var deviceModuleTitle = ' \
-    <p> \
-        <button class="btn" type="button" data-bs-toggle="collapse" data-bs-target="#device_a_content" aria-expanded="false" aria-controls="device_a_content"> \
-            <span id="device_module_name">DIR-2150 - Full Test</span> \
-        </button> \
-    </p>';
 
 window.onload = function() {
     SpecObject = new SpecTestingTime();
@@ -27,18 +21,11 @@ window.onclick = function() {
          SpecObject.specOnClick(event);
     });
 
-    // Deprecated
-    $("#select_movement_right").unbind().click(function() {
+    $(".test_item").unbind().click(function(event) {
         /*
-         * Click 'OK' buttom
-         * 
-         * Note:
-         *    One click trigger click-event multiple times.
-         *    Answer at StackOverFlow:
-         *    https://stackoverflow.com/questions/14969960/jquery-click-events-firing-multiple-times
+         * Select every test items.
          */
-        console.log("Selected and saved the setting with specific device mmodule.");
-        SpecObject.saveSpecTestingTimeCalculationSetting();
+        $(event.target);
     });
 
     $("#add_testing_item").unbind().click(function() {
@@ -53,13 +40,21 @@ window.onclick = function() {
         console.log("Selected and saved the setting with specific device mmodule.");
         SpecObject.addSelectedTestingItem();
     });
-    
-    $("#select_movement_left").unbind().click(function(event) {
+
+    $(".remove_test_items").unbind().click(function(event) {
         /*
-         * Click 'Back to Edit' buttom
+         * Click the buttom at 'x' in tag
          */
-        console.log("Back the setting edit step.");
-        SpecObject.backToEditor();
+        var target_remove_test_item = $(event.target).parent();
+        SpecObject.removeTargetTestItem(target_remove_test_item);
+    });
+
+    $(".remove_all_test_items").unbind().click(function(event) {
+        /*
+         * Click 'Clear' buttom
+         */
+        var target_remove_test_item = $(event.target).parent();
+        SpecObject.removeAllTestItem(target_remove_test_item);
     });
     
     $("#export_report").unbind().click(function(event) {
@@ -310,6 +305,40 @@ SpecTestingTime.prototype.generateDeviceModuleContent = function(device_model, s
     })
 
     // return content;
+}
+
+
+SpecTestingTime.prototype.removeTargetTestItem = function(element) {
+    // Get the target test item
+    var test_item = $(element).text().replaceAll(" ", "").split(":")[0];
+    var module_and_spec = $(element).parent().attr("id");
+    var spec_re = /_.{1,16}_test/g;
+    var underline_spec_type = module_and_spec.match(spec_re)[0];
+    // Get the Spec type of target test item
+    var spec_type = underline_spec_type.substring(1);
+    // Get the device module of target test item
+    var device_module = module_and_spec.split(underline_spec_type)[0];
+
+    var test_items = TestingModuleContent[device_module][spec_type];
+    var new_test_items = test_items.filter(function(value, index, arr) {
+        return value.match(test_item) == null;
+    });
+    TestingModuleContent[device_module][spec_type] = new_test_items;
+
+    $(element).remove();
+}
+
+
+SpecTestingTime.prototype.removeAllTestItem = function(element) {
+    // Delete all test items
+    var target_remove_all_device_module = $(element).prev().text().replaceAll(" ", "")
+    delete TestingModuleContent[target_remove_all_device_module];
+
+    // Remove all element location
+    var module_title = target_remove_all_device_module + "_name";
+    var module_content = target_remove_all_device_module + "_content";
+    $("#" + module_title).remove();
+    $("#" + module_content).remove();
 }
 
 
