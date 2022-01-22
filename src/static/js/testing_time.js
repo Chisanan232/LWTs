@@ -21,11 +21,11 @@ window.onclick = function() {
          SpecObject.specOnClick(event);
     });
 
-    $(".test_item").unbind().click(function(event) {
+    $("input.test_item").change(function() {
         /*
          * Select every test items.
          */
-        $(event.target);
+        SpecObject.calculateTestingTime(this);
     });
 
     $("#add_testing_item").unbind().click(function() {
@@ -94,6 +94,22 @@ SpecTestingTime.prototype.specOnClick = function(event) {
 
     console.error("device_model: " + device_model)
     self.getSpecItemsTestingTime(TestingSpecType, device_model);
+}
+
+
+SpecTestingTime.prototype.calculateTestingTime = function(this_ele) {
+    var current_total_time = $("#total_testing_time_value").text();
+    var total_testing_time = 0;
+
+    if ($("input:checkbox[class=test_item]:checked").length == 0) {}
+    
+    $("input:checkbox[class=test_item]:checked").each(function() {
+        var testing_time = Object.values(JSON.parse(this.value))[0];
+        total_testing_time = parseFloat(total_testing_time) + parseFloat(testing_time);
+    });
+
+    $("#total_testing_time_value").empty();
+    $("#total_testing_time_value").append(parseFloat(current_total_time) + parseFloat(total_testing_time));
 }
 
 

@@ -10,12 +10,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="static/css/style_new.css" />
+    <link rel="stylesheet" type="text/css" href="static/css/style.css" />
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-    <script src="static/js/testing_time_new.js"></script>
+    <script src="static/js/testing_time.js"></script>
 
 </head>
 <body>
@@ -37,35 +37,48 @@
             </div>
         </div>
 
+        <div class="row" id="test_plan_type_selector">
+            <div class="col-lg-4">
+                <span id="test_plan_type_header">Test Plan: </span>
+                <select id="test_plan_type">
+                    <option value=""> ---請選擇測試類別--- </option>
+                    <option value="full_test"> Full Test </option>
+                    <option value="regression_test"> Regression Test </option>
+                    <option value="easy_test"> Easy Test </option>
+                    <option value="sampling_test"> Sampling Test </option>
+                </select>
+            </div>
+        </div>
+
+
+        <!--
+            Deprecated these scetions
         <div class="row">
             <div class="col spec_test_plan">
                 <label id="">
-                    <!-- <span> Full Test </span><input type="checkbox" value="Export Report"> -->
                     <button type="button" class="test_plan btn btn-default btn-lg" value="full_test"> Full Test </button>
                 </label>
             </div>
 
             <div class="col spec_test_plan">
                 <label id="">
-                    <!-- <span> Regression Test </span><input type="radio" value="Export Report"> -->
                     <button type="button" class="test_plan btn btn-default btn-lg" value="regression_test"> Regression Test </button>
                 </label>
             </div>
 
             <div class="col spec_test_plan">
                 <label id="">
-                    <!-- <span> Easy Test </span><input type="radio" value="Export Report"> -->
                     <button type="button" class="test_plan btn btn-default btn-lg" value="easy_test"> Easy Test </button>
                 </label>
             </div>
 
             <div class="col spec_test_plan">
                 <label id="">
-                    <!-- <span> Sampling Test </span><input type="radio" value="Export Report"> -->
                     <button type="button" class="test_plan btn btn-default btn-lg" value="sampling_test"> Sampling Test </button>
                 </label>
             </div>
         </div>
+        -->
 
         <div class="row justify-content-start" id="current_setting_header">
             <div id="current_info">Currently Testing Info: </div>
@@ -75,6 +88,8 @@
             <div class="col" id="current_device_model">Device Model: <span id="current_device_model_value"></span></div>
             <div class="w-100"></div>
             <div class="col" id="current_test_plan">Test Plan: <span id="current_test_plan_value"></span></div>
+            <div class="w-100"></div>
+            <div class="col" id="total_testing_time">Total Testing Time: <span id="total_testing_time_value">0</span> Hours</div>
         </div>
         
         <div class="row justify-content-start align-items-center">
@@ -86,7 +101,7 @@
                             <input type="button" value="Add" id="add_items_buttom">
                         </label>
                         -->
-                        <span class="add_test_items badge bg-primary" id="add_testing_item">
+                        <span class="add_test_items badge bg-success" id="add_testing_item">
                             Add
                             <span class="glyphicon glyphicon-plus"></span>
                         </span>
