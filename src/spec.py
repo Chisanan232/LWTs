@@ -1,10 +1,11 @@
-from exceptions import DeviceModelDoesnotExistException, ParameterCannotBeNone
-
 from abc import ABCMeta, abstractmethod
 from typing import List, Dict
 from string import ascii_uppercase
 from openpyxl import Workbook, load_workbook
+import pathlib
+import os
 
+from exceptions import DeviceModelDoesnotExistException, ParameterCannotBeNone
 
 
 _Spec_Device_Info: List[Dict[str, str]] = []
@@ -13,6 +14,8 @@ _Spec_Device_Info: List[Dict[str, str]] = []
 class TestSpec(metaclass=ABCMeta):
 
     __DLink_Test_Time_Spec_File_Name: str = "D-Link-Wi-Fi-config_time_for_tool.xlsx"
+    __Project_Root_Dir = str(pathlib.Path(__file__).absolute().parent.parent)
+    __Testing_Time_Config_Path = os.path.join(__Project_Root_Dir, "cnf", "testing_time", __DLink_Test_Time_Spec_File_Name)
 
     # _Spec_Device_Info: List[Dict[str, str]] = None
 
@@ -26,7 +29,7 @@ class TestSpec(metaclass=ABCMeta):
 
 
     def loading_content(self, read_only=True) -> None:
-        self._DLink_Spec_WorkBook = load_workbook(filename=self.__DLink_Test_Time_Spec_File_Name, read_only=read_only)
+        self._DLink_Spec_WorkBook = load_workbook(filename=self.__Testing_Time_Config_Path, read_only=read_only)
 
 
     def get_sheet_by_name(self, name: str) -> None:
