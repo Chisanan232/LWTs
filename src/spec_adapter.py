@@ -1,7 +1,7 @@
-from spec import TestSpec
-
 from flask import jsonify
 from openpyxl.workbook import Workbook
+
+from .spec import TestSpec
 
 
 

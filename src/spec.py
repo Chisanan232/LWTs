@@ -5,7 +5,7 @@ from openpyxl import Workbook, load_workbook
 import pathlib
 import os
 
-from exceptions import DeviceModelDoesnotExistException, ParameterCannotBeNone
+from .exceptions import DeviceModelDoesnotExistException, ParameterCannotBeNone
 
 
 _Spec_Device_Info: List[Dict[str, str]] = []

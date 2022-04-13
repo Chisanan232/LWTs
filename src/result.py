@@ -1,7 +1,3 @@
-from spec_adapter import DLinkHomeProductSpec
-from spec import TestSpec, ResultTestSpec, FullTestSpec, RegressionTestSpec, EasyTestSpec
-from columns import FullTestColumns, RegressionTestColumns, EasyTestColumns
-
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.cell import Cell
@@ -12,9 +8,18 @@ from typing import Iterable, Dict, Tuple
 from copy import copy
 from ast import literal_eval
 import logging
+import pathlib
 import json
 import re
+import os
 
+from .spec_adapter import DLinkHomeProductSpec
+from .spec import TestSpec, ResultTestSpec, FullTestSpec, RegressionTestSpec, EasyTestSpec
+from .columns import FullTestColumns, RegressionTestColumns, EasyTestColumns
+
+
+_project_root_dir = str(pathlib.Path(__file__).absolute().parent.parent)
+_project_cnf_path = os.path.join(_project_root_dir, "cnf")
 
 
 class ResultReport:
