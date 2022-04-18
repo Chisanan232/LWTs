@@ -14,13 +14,10 @@ class SpecService:
 
 
     def get_device_modules(self):
-        test = self._target_spec.get_all_device_model()
-        print(f"test value: {test}")
         return jsonify(self._target_spec.get_all_device_model())
     
 
     def get_all_testing_info(self, request: Request):
-        print("request: ", request.form)
         if "spec" in request.form and "deviceModel" in request.form:
             selected_spec = request.form["spec"]
             device_model = request.form["deviceModel"]
