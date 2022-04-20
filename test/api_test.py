@@ -119,11 +119,12 @@ class TestSpecAPIs:
         """
 
         # # # # Prepare the body (the parameters of API) 
-        spec_type = "full"
+        spec_type = "full_test"
         device_model = "DIR-882"
 
-        _test_item_info_char = '{"Advance parental control":0,"COVR-Reunion":0,"D-Link DeFend full function":0,"FOTA In Wizard":0,"Internet":2.1,"Management-AP":0,"Management-router":3,"Operation":0,"Parental control":2,"Remote management":0,"Side Menu":0.5,"main page-router":1.4,"main\\u00a0page-AP":0,"mesh compatibility":0,"smart connect Wi-Fi Settings":2,"wizard":3.9}'
+        # _test_item_info_char = {"Advance parental control":0,"COVR-Reunion":0,"D-Link DeFend full function":0,"FOTA In Wizard":0,"Internet":2.1,"Management-AP":0,"Management-router":3,"Operation":0,"Parental control":2,"Remote management":0,"Side Menu":0.5,"main page-router":1.4,"main page-AP":0,"mesh compatibility":0,"smart connect Wi-Fi Settings":2,"wizard":3.9}
         # _test_item_info_str = json.dumps(_test_item_info_char).encode("utf-8")
+        _test_item_info_char = ["{\"Internet\": 2.1}","{\"Management-router\": 3}"]
         _test_item = {
             "device_model": device_model,
             "spec_type": spec_type,
@@ -140,13 +141,10 @@ class TestSpecAPIs:
             )
         _data = _response.data
         _workbook: Workbook = load_workbook(BytesIO(_data))
-        print(f"_workbook: {_workbook}")
         _worksheet = _workbook.worksheets[0]
-        print(f"_worksheet: {_worksheet}")
         _workersheet_iter_rows = _worksheet.iter_rows()
-        print(f"_workersheet_iter_rows: {_workersheet_iter_rows}")
-        for _row in _workersheet_iter_rows:
-            print(f"[DEBUG] row: {_row}")
-
-        assert False
+        for _rows in _workersheet_iter_rows:
+            _device_module = _rows[2].value
+            if _device_module == device_model:
+                assert _rows[3].value == 5.1, "The value of cell should be equal to the data we input into API."
 
