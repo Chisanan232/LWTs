@@ -21,15 +21,10 @@ def create_app() -> Flask:
         return render_template("index.html")
 
 
-    @_app.route("/static/<path:filename>", methods=["GET"])
-    def images(filename):
-        return send_from_directory('img', filename)
+    # @_app.route("/static/<path:filename>", methods=["GET"])
+    # def images(filename):
+    #     return send_from_directory('img', filename)
         
-
-    @_app.route("/api/v1/test", methods=["GET"])
-    def index():
-        return "It's Leslie's Tool!"
-
 
     @_app.route("/api/v1/deviceModels", methods=["GET"])
     def device_models():
@@ -43,12 +38,6 @@ def create_app() -> Flask:
         # # device_model = "COVR-1103_A1"
         _testing_time_info = _Spec_Svc.get_all_testing_info(request=request)
         return _testing_time_info
-
-
-    @_app.route("/api/v1/calculate-timing", methods=["GET"])
-    def calculate_timing():
-        items_time = request.form["items_time"]
-        sum(items_time)
 
 
     @_app.route("/api/v1/export-testing-time-result", methods=["POST"])
