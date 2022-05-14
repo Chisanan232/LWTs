@@ -1,0 +1,6 @@
+[run]
+relative_files = True
+source=./src
+
+omit =
+    */__init__.py
