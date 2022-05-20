@@ -11,7 +11,7 @@
   fail_on_prepare_env_warning: true
 
   actions:
-  - action: "Execute: Run test"
+  - action: "Execute:"
     type: "BUILD"
     working_directory: "/buddy/lwts-1"
     docker_image_name: "library/python"
